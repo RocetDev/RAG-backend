@@ -1,0 +1,49 @@
+services:
+  qdrant-db:
+    image: qdrant/qdrant:latest
+    container_name: qdrant_db
+    volumes:
+      - ./qdrant_storage:/qdrant/storage:z
+    ports:
+      - 6333:6333
+      - 6334:6334
+    networks:
+      - main-net
+
+  rag-backend:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.rag_backend
+    container_name: rag_backend
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./app.log:/src/app.log 
+    env_file:
+      - .env
+    networks:
+      - main-net
+    depends_on:
+      - qdrant-db
+
+  # nginx:
+  #   image: nginx:latest
+  #   restart: always
+  #   ports:
+  #    - "80:80"
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf:ro
+  #   networks:
+  #     - main-net
+  #   depends_on:
+  #     - qdrant-db
+  #     - rag-backend
+
+networks:
+  main-net:
+    driver: bridge
+
+  
+  
+  
+
